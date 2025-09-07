@@ -28,6 +28,23 @@ public class WorkoutRepository(AppDbContext db)
         await db.SaveChangesAsync();
         return workout;
     }
+    
+    public async Task<List<WorkoutExercise>> AddExercisesToWorkoutAsync(string workoutName, List<WorkoutExercise> exercises, Guid userId)
+    {
+        var workout = await db.Workouts
+            .FirstOrDefaultAsync(w => w.Name == workoutName);
+        
+        if(workout == null)
+            throw new InvalidOperationException("Workout not found.");
+        
+        if(workout.IsCustom && workout.CreatedBy != userId)
+            throw new InvalidOperationException("Not allowed to modify this workout");
+        
+        db.WorkoutExercises.AddRange(exercises);
+        await db.SaveChangesAsync();
+        
+        return exercises;
+    }
 
     public async Task DeleteAsync(string workoutName, Guid userId)
     {

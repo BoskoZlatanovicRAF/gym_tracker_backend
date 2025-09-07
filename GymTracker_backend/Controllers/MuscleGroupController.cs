@@ -1,5 +1,6 @@
 using GymTracker_backend.DTOs.Requests;
 using GymTracker_backend.DTOs.Responses;
+using GymTracker_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

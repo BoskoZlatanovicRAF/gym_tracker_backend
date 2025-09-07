@@ -11,6 +11,7 @@ public interface IWorkoutService
     Task<List<WorkoutResponse>> GetVisibleToUserAsync(Guid userId);
     Task<List<WorkoutResponse>> GetWorkoutByNameAsync(string name);
     Task<WorkoutResponse> CreateAsync(WorkoutRequest request, Guid userId);
+    Task<List<WorkoutExerciseResponse>> AddExercisesToWorkout(string workoutName, List<WorkoutExerciseRequest> exercises, Guid userId);
     Task DeleteAsync(string workoutName, Guid userId);
 }
 
@@ -22,10 +23,10 @@ public class WorkoutService(WorkoutRepository repo) : IWorkoutService
         return workouts.Select(w => w.ToResponse()).ToList();
     }
 
-    public Task<List<WorkoutResponse>> GetWorkoutByNameAsync(string name)
+    public async Task<List<WorkoutResponse>> GetWorkoutByNameAsync(string name)
     {
-        var workouts = repo.GetWorkoutByNameAsync(name);
-        return null;
+        var workouts = await repo.GetWorkoutByNameAsync(name);
+        return workouts.Select(w => w.ToResponse()).ToList();
     }
 
     public async Task<WorkoutResponse> CreateAsync(WorkoutRequest request, Guid userId)
@@ -42,6 +43,25 @@ public class WorkoutService(WorkoutRepository repo) : IWorkoutService
 
         var created = await repo.AddAsync(workout);
         return created.ToResponse();
+    }
+
+    public async Task<List<WorkoutExerciseResponse>> AddExercisesToWorkout(
+        string workoutName,
+        List<WorkoutExerciseRequest> exercises, 
+        Guid userId)
+    {
+        var entities = exercises.Select(r => new WorkoutExercise
+        {
+            WorkoutName = workoutName,
+            ExerciseName = r.ExerciseName,
+            OrderInWorkout = r.OrderInWorkout,
+            TargetSets = r.TargetSets,
+            TargetReps = r.TargetReps,
+            TargetWeightKg = r.TargetWeightKg
+        }).ToList();
+        
+        var created = await repo.AddExercisesToWorkoutAsync(workoutName, entities, userId);
+        return created.Select(e => e.ToResponse()).ToList();
     }
 
     public async Task DeleteAsync(string workoutName, Guid userId)
