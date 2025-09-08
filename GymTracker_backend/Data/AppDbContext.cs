@@ -19,6 +19,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<WorkoutExercise>()
             .HasKey(we => new { we.WorkoutName, we.ExerciseName });
         
+        modelBuilder.Entity<WorkoutExercise>()
+            .HasOne(we => we.Workout)
+            .WithMany(w => w.WorkoutExercises)
+            .HasForeignKey(we => we.WorkoutName);
+
+        modelBuilder.Entity<WorkoutExercise>()
+            .HasOne(we => we.Exercise)
+            .WithMany(e => e.WorkoutExercises)
+            .HasForeignKey(we => we.ExerciseName);
+        
         base.OnModelCreating(modelBuilder);
 
     }
