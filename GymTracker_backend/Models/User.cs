@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GymTracker_backend.Models;
@@ -5,6 +6,7 @@ namespace GymTracker_backend.Models;
 [Table("users")]
 public class User
 {
+    [Key]
     [Column("id")]
     public Guid Id { get; set; }
     
@@ -38,7 +40,13 @@ public class User
     [Column("deleted_at")]
     public DateTime? DeletedAt { get; set; }
 
-    public List<WorkoutSession> WorkoutSessions { get; set; }
-    public List<Exercise> CustomExercises { get; set; }
-    public List<Workout> CustomWorkouts { get; set; }
+
+    [InverseProperty(nameof(WorkoutSession.User))]
+    public List<WorkoutSession> WorkoutSessions { get; set; } = [];
+
+    [InverseProperty(nameof(Exercise.Creator))]
+    public List<Exercise> CustomExercises { get; set; } = [];
+
+    [InverseProperty(nameof(Workout.Creator))]
+    public List<Workout> CustomWorkouts { get; set; } = [];
 }

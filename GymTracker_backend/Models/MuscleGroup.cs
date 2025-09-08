@@ -15,5 +15,8 @@ public class MuscleGroup
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-    public Category Category { get; set; }
+    [ForeignKey(nameof(CategoryName))]
+    [InverseProperty(nameof(Category.MuscleGroups))]
+    public Category Category { get; set; } = null!;
+
 }

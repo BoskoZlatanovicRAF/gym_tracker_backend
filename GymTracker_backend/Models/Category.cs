@@ -14,6 +14,6 @@ public class Category
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-    public List<Exercise> Exercises { get; set; } = new();
-    public List<MuscleGroup> MuscleGroups { get; set; } = new();
+    public List<Exercise> Exercises { get; set; } = [];
+    public List<MuscleGroup> MuscleGroups { get; set; } = [];
 }

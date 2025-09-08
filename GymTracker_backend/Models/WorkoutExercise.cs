@@ -24,6 +24,6 @@ public class WorkoutExercise
     public double? TargetWeightKg { get; set; }
 
     // Navigation
-    public Workout Workout { get; set; }
-    public Exercise Exercise { get; set; }
+    public Workout Workout { get; set; } = null!;
+    public Exercise Exercise { get; set; } = null!;
 }

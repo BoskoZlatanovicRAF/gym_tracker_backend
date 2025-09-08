@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GymTracker_backend.Models;
@@ -5,6 +6,7 @@ namespace GymTracker_backend.Models;
 [Table("exercise_performances")]
 public class ExercisePerformance
 {
+    [Key]
     [Column("id")]
     public Guid Id { get; set; }
 
@@ -26,7 +28,13 @@ public class ExercisePerformance
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Navigation
-    public WorkoutSession Session { get; set; }
-    public Exercise Exercise { get; set; }
+    // Navigation: Session
+    [ForeignKey(nameof(SessionId))]
+    [InverseProperty(nameof(WorkoutSession.Performances))]
+    public WorkoutSession Session { get; set; } = null!;
+
+    // Navigation: Exercise
+    [ForeignKey(nameof(ExerciseName))]
+    [InverseProperty(nameof(Exercise.PerformanceLogs))]
+    public Exercise Exercise { get; set; } = null!;
 }

@@ -6,6 +6,7 @@ namespace GymTracker_backend.Models;
 [Table("exercises")]
 public class Exercise
 {
+    [Key]
     [Column("name")]
     public string Name { get; set; } = null!;
 
@@ -34,7 +35,16 @@ public class Exercise
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation
+    [ForeignKey(nameof(CategoryName))]
     public Category Category { get; set; }
+    
+    [ForeignKey(nameof(CreatedBy))]
+    [InverseProperty(nameof(User.CustomExercises))]
     public User? Creator { get; set; }
-    public List<WorkoutExercise> WorkoutExercises { get; set; }
+
+
+    public List<WorkoutExercise> WorkoutExercises { get; set; } = [];
+    
+    [InverseProperty(nameof(ExercisePerformance.Exercise))]
+    public List<ExercisePerformance> PerformanceLogs { get; set; } = [];
 }
