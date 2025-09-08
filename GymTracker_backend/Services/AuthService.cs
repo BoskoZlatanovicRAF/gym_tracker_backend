@@ -18,7 +18,7 @@ public interface IAuthService
     Task<string> LoginAsync(LoginRequest request);
 }
 
-public class AuthService(IUserRepository userRepository, IConfiguration configuration) : IAuthService
+public class AuthService(UserRepository userRepository, IConfiguration configuration) : IAuthService
 {
     public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
     {

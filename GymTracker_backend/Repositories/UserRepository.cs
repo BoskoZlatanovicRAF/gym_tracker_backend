@@ -5,14 +5,8 @@ using Microsoft.EntityFrameworkCore;
 namespace GymTracker_backend.Repositories;
 
 
-public interface IUserRepository
-{
-    Task<User?> GetByEmailAsync(string email);
-    Task AddUserAsync(User user);
-}
 
-
-public class UserRepository(AppDbContext db) : IUserRepository
+public class UserRepository(AppDbContext db)
 {
     public async Task<User?> GetByEmailAsync(string email)
     {
