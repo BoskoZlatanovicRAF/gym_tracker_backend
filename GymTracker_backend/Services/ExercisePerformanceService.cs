@@ -34,5 +34,6 @@ public class ExercisePerformanceService(ExercisePerformanceRepository repo) : IE
     public async Task<List<ExercisePerformanceResponse>> GetBySessionIdAsync(Guid sessionId)
     {
         var performances = await repo.GetBySessionIdAsync(sessionId);
-        return performances.Select(p => p.ToResponse()).ToList();    }
+        return performances.Select(p => p.ToResponse()).ToList();    
+    }
 }

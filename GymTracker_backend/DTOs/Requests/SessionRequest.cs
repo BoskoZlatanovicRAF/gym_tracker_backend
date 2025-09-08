@@ -1,13 +1,22 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GymTracker_backend.DTOs.Requests;
 
 public class StartSessionRequest
 {
-    public string? WorkoutName { get; set; }
+    [Required]
+    public string WorkoutName { get; set; } = null!;
+
+    [MaxLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters.")]
     public string? Notes { get; set; }
 }
 
 public class EndSessionRequest
 {
-    public double? TotalCalories { get; set; }
+    [Required]
+    [Range(0, double.MaxValue, ErrorMessage = "TotalCalories must be non-negative.")]
+    public double TotalCalories { get; set; }
+
+    [MaxLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters.")]
     public string? Notes { get; set; }
 }
