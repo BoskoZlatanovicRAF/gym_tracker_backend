@@ -1,5 +1,8 @@
 using System.Text;
+using DotNetEnv;
 using GymTracker_backend.Data;
+using GymTracker_backend.Repositories;
+using GymTracker_backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +13,8 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        Env.Load();
+        
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers();
@@ -32,6 +37,20 @@ public class Program
                         Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"] ?? "dev-secret"))
                 };
             });
+        
+        builder.Services.AddScoped<UserRepository>();
+        builder.Services.AddScoped<ExerciseRepository>();
+        builder.Services.AddScoped<WorkoutRepository>();
+        builder.Services.AddScoped<SessionRepository>();
+        builder.Services.AddScoped<ExercisePerformanceRepository>();
+
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IExerciseService, ExerciseService>();
+        builder.Services.AddScoped<IWorkoutService, WorkoutService>();
+        builder.Services.AddScoped<ISessionService, SessionService>();
+        builder.Services.AddScoped<IExercisePerformanceService, ExercisePerformanceService>();
+        builder.Services.AddScoped<ICategoryService, CategoryService>();
+        builder.Services.AddScoped<IMuscleGroupService, MuscleGroupService>();
         
         var app = builder.Build();
 
