@@ -39,7 +39,7 @@ public class WorkoutController(IWorkoutService service) : ControllerBase
         return Ok(new { workout = result });
     }
 
-    [HttpPut("{name}/exercises")]
+    [HttpPost("{name}/exercises")]
     public async Task<ActionResult<List<WorkoutExerciseResponse>>> AddExercisesToWorkout(
         [FromRoute] string name, 
         [FromBody] List<WorkoutExerciseRequest> exercises)
