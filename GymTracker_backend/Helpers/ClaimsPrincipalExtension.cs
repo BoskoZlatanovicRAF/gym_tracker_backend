@@ -7,6 +7,10 @@ public static class ClaimsPrincipalExtension
 {
     public static Guid GetUserId(this ClaimsPrincipal user)
     {
-        return Guid.Parse(user.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
+        var id = user.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                 ?? user.FindFirstValue(ClaimTypes.NameIdentifier)
+                 ?? throw new InvalidOperationException("No user id claim found");
+
+        return Guid.Parse(id);
     }
 }
