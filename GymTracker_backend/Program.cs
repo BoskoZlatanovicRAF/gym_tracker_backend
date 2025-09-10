@@ -2,6 +2,7 @@ using System.Text;
 using DotNetEnv;
 using GymTracker_backend.Data;
 using GymTracker_backend.Repositories;
+using GymTracker_backend.Seeders;
 using GymTracker_backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +62,13 @@ public class Program
         app.UseAuthorization();
         
         app.MapControllers();
+        
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        //     db.Database.EnsureCreated();
+        //     DbSeeder.Seed(db);
+        // }
         
         app.Run();
     }
