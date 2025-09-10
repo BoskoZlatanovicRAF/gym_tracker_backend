@@ -16,6 +16,6 @@ public class ExercisePerformanceController(IExercisePerformanceService service) 
         [FromBody] List<ExercisePerformanceRequest> requests)
     {
         await service.RecordAsync(sessionId, requests);
-        return StatusCode(StatusCodes.Status201Created);
+        return Created();
     }
 }

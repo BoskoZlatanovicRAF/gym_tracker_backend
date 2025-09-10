@@ -13,11 +13,11 @@ public class SessionRepository(AppDbContext db)
         return session;
     }
 
-    public async Task EndAsync(Guid sessionId, DateTime endTime, double? calories, string? notes)
+    public async Task EndAsync(Guid userId, DateTime endTime, double? calories, string? notes)
     {
-        var session = await db.WorkoutSessions.FindAsync(sessionId);
+        var session = await db.WorkoutSessions.FirstOrDefaultAsync(s => s.UserId == userId && s.EndTime == null);
         if (session == null)
-            throw new InvalidOperationException("Session not found");
+            throw new InvalidOperationException("No active session found for user.");
 
         session.EndTime = endTime;
         session.TotalCalories = calories;
@@ -31,6 +31,7 @@ public class SessionRepository(AppDbContext db)
     {
         return await db.WorkoutSessions
             .Where(s => s.UserId == userId)
+            .Include(s => s.Workout)
             .OrderByDescending(s => s.StartTime)
             .ToListAsync();
     }

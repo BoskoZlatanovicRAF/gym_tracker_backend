@@ -4,6 +4,7 @@ using GymTracker_backend.Helpers;
 using GymTracker_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymTracker_backend.Controllers;
 [ApiController]
@@ -23,8 +24,19 @@ public class ExerciseController(IExerciseService exerciseService) : ControllerBa
     [HttpPost]
     public async Task<ActionResult<ExerciseResponse>> CreateExercise([FromBody] ExerciseRequest exerciseRequest)
     {
-        var userId = User.GetUserId();
-        var result = await exerciseService.CreateExerciseAsync(exerciseRequest, userId);
-        return Ok(new { exercise = result });
+        try
+        {
+            var userId = User.GetUserId();
+            var result = await exerciseService.CreateExerciseAsync(exerciseRequest, userId);
+            return Ok(new { exercise = result });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return ex.ToString().Contains("for this user") 
+                ? Conflict(new { message = ex.Message }) 
+                : BadRequest(new { message = ex.Message });
+        }
+        
+
     }
 }

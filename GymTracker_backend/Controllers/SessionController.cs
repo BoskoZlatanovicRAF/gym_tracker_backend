@@ -20,10 +20,11 @@ public class SessionController(ISessionService service) : ControllerBase
         return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
     }
 
-    [HttpPatch("{id}/end")]
-    public async Task<IActionResult> End(Guid id, [FromBody] EndSessionRequest request)
+    [HttpPatch("end")]
+    public async Task<IActionResult> End([FromBody] EndSessionRequest request)
     {
-        await service.EndSessionAsync(id, request);
+        var userId = User.GetUserId();
+        await service.EndSessionAsync(userId, request);
         return Ok(new { message = "Session ended" });
     }
 

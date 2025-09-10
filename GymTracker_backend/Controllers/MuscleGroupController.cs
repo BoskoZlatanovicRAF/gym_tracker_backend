@@ -21,7 +21,15 @@ public class MuscleGroupController(IMuscleGroupService service) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<MuscleGroupResponse>> Create([FromBody] MuscleGroupRequest request)
     {
-        var result = await service.CreateAsync(request);
-        return Ok(new { muscleGroup = result });
+        try
+        {
+            var result = await service.CreateAsync(request);
+            return Ok(new { muscleGroup = result });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new{message = ex.Message});
+        }
+        
     }
 }

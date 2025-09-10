@@ -19,7 +19,6 @@ public class ExercisePerformanceService(ExercisePerformanceRepository repo) : IE
     {
         var performances = requests.Select(r => new ExercisePerformance
         {
-            Id = Guid.NewGuid(),
             SessionId = sessionId,
             ExerciseId = r.ExerciseId,
             SetNumber = r.SetNumber,

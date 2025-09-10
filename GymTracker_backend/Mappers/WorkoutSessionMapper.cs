@@ -5,14 +5,14 @@ namespace GymTracker_backend.Mappers;
 
 public static class WorkoutSessionMapper
 {
-    public static WorkoutSessionResponse ToResponse(this WorkoutSession s)
+    public static WorkoutSessionResponse ToResponse(this WorkoutSession s, string workoutName = "")
     {
         return new WorkoutSessionResponse
         {
             Id = s.Id,
             UserId = s.UserId,
             WorkoutId = s.WorkoutId,
-            WorkoutName = s.Workout?.Name ?? "",
+            WorkoutName = workoutName,
             StartTime = s.StartTime,
             EndTime = s.EndTime,
             TotalCalories = s.TotalCalories,

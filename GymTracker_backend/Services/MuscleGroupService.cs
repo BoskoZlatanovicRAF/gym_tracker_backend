@@ -26,6 +26,14 @@ public class MuscleGroupService(AppDbContext db) : IMuscleGroupService
 
     public async Task<MuscleGroupResponse> CreateAsync(MuscleGroupRequest request)
     {
+        
+        if (await db.MuscleGroups.AnyAsync(mg => mg.Name.ToLower() == request.Name.ToLower()))
+            throw new InvalidOperationException($"Muscle group with name '{request.Name}' already exists.");
+
+
+        if (await db.Categories.AnyAsync(c => c.Name.ToLower() != request.CategoryName.ToLower()))
+            throw new InvalidOperationException($"Category with name '{request.CategoryName}' doesn't exist.");
+        
         var mg = new MuscleGroup
         {
             Name = request.Name,
