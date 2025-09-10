@@ -1,10 +1,6 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using GymTracker_backend.DTOs.Requests;
 using GymTracker_backend.DTOs.Responses;
 using GymTracker_backend.Helpers;
-using GymTracker_backend.Models;
-using GymTracker_backend.Repositories;
 using GymTracker_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -14,17 +14,31 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterRequest registerRequest)
     {
-        var result = await authService.RegisterAsync(registerRequest);
+        try
+        {
+            var result = await authService.RegisterAsync(registerRequest);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new{ message = ex.Message});
+        }
         
-        return Ok(result);
     }
     
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
-        var result = await authService.LoginAsync(loginRequest);
+        try
+        {
+            var result = await authService.LoginAsync(loginRequest);
+            return Ok(new { jwt = result });
+
+        }catch (InvalidOperationException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
         
-        return Ok(new { jwt = result });
     }
 }

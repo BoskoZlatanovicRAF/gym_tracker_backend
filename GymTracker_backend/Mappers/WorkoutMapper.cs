@@ -9,6 +9,7 @@ public static class WorkoutMapper
     {
         return new WorkoutResponse
         {
+            Id = workout.Id,
             Name = workout.Name,
             Description = workout.Description,
             ImageUrl = workout.ImageUrl,

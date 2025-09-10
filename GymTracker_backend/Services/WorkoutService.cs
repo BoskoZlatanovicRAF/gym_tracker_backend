@@ -9,9 +9,9 @@ namespace GymTracker_backend.Services;
 public interface IWorkoutService
 {
     Task<List<WorkoutResponse>> GetVisibleToUserAsync(Guid userId);
-    Task<List<WorkoutResponse>> GetWorkoutByNameAsync(string name);
+    Task<List<WorkoutResponse>> GetWorkoutByNameAsync(Guid workoutId);
     Task<WorkoutResponse> CreateAsync(WorkoutRequest request, Guid userId);
-    Task<List<WorkoutExerciseResponse>> AddExercisesToWorkout(string workoutName, List<WorkoutExerciseRequest> exercises, Guid userId);
+    Task<List<WorkoutExerciseResponse>> AddExercisesToWorkout(Guid workoutId, List<WorkoutExerciseRequest> exercises, Guid userId);
     Task DeleteAsync(string workoutName, Guid userId);
 }
 
@@ -23,9 +23,9 @@ public class WorkoutService(WorkoutRepository repo) : IWorkoutService
         return workouts.Select(w => w.ToResponse()).ToList();
     }
 
-    public async Task<List<WorkoutResponse>> GetWorkoutByNameAsync(string name)
+    public async Task<List<WorkoutResponse>> GetWorkoutByNameAsync(Guid workoutId)
     {
-        var workouts = await repo.GetWorkoutByNameAsync(name);
+        var workouts = await repo.GetWorkoutByNameAsync(workoutId);
         return workouts.Select(w => w.ToResponse()).ToList();
     }
 
@@ -46,21 +46,21 @@ public class WorkoutService(WorkoutRepository repo) : IWorkoutService
     }
 
     public async Task<List<WorkoutExerciseResponse>> AddExercisesToWorkout(
-        string workoutName,
+        Guid workoutId,
         List<WorkoutExerciseRequest> exercises, 
         Guid userId)
     {
         var entities = exercises.Select(r => new WorkoutExercise
         {
-            WorkoutName = workoutName,
-            ExerciseName = r.ExerciseName,
+            WorkoutId = workoutId,
+            ExerciseId = r.ExerciseId,
             OrderInWorkout = r.OrderInWorkout,
             TargetSets = r.TargetSets,
             TargetReps = r.TargetReps,
             TargetWeightKg = r.TargetWeightKg
         }).ToList();
         
-        var created = await repo.AddExercisesToWorkoutAsync(workoutName, entities, userId);
+        var created = await repo.AddExercisesToWorkoutAsync(workoutId, entities, userId);
         return created.Select(e => e.ToResponse()).ToList();
     }
 

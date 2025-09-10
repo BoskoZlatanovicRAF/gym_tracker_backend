@@ -9,7 +9,8 @@ public static class WorkoutExerciseMapper
     {
         return new WorkoutExerciseResponse
         {
-            ExerciseName = we.ExerciseName,
+            ExerciseId = we.ExerciseId,
+            ExerciseName = we.Exercise.Name ?? "",
             OrderInWorkout = we.OrderInWorkout,
             TargetSets = we.TargetSets,
             TargetReps = we.TargetReps,

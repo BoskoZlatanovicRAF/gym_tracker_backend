@@ -5,7 +5,7 @@ namespace GymTracker_backend.DTOs.Requests;
 public class StartSessionRequest
 {
     [Required]
-    public string WorkoutName { get; set; } = null!;
+    public Guid WorkoutId{ get; set; }
 
     [MaxLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters.")]
     public string? Notes { get; set; }

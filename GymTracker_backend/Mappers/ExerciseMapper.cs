@@ -9,6 +9,7 @@ public static class ExerciseMapper
     {
         return new ExerciseResponse
         {
+            Id = exercise.Id,
             Name = exercise.Name,
             CategoryName = exercise.CategoryName,
             MuscleGroupNames = exercise.MuscleGroupNames,

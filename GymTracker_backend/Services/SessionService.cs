@@ -21,7 +21,7 @@ public class SessionService(SessionRepository repo) : ISessionService
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            WorkoutName = request.WorkoutName,
+            WorkoutId = request.WorkoutId,
             StartTime = DateTime.UtcNow,
             Notes = request.Notes,
             CreatedAt = DateTime.UtcNow,

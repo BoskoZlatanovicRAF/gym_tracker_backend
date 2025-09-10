@@ -21,7 +21,7 @@ public class ExercisePerformanceService(ExercisePerformanceRepository repo) : IE
         {
             Id = Guid.NewGuid(),
             SessionId = sessionId,
-            ExerciseName = r.ExerciseName,
+            ExerciseId = r.ExerciseId,
             SetNumber = r.SetNumber,
             Reps = r.Reps,
             WeightKg = r.WeightKg,

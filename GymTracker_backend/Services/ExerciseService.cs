@@ -15,6 +15,7 @@ public interface IExerciseService
 }
 public class ExerciseService(ExerciseRepository exerciseRepository) : IExerciseService
 {
+    
     public async Task<List<ExerciseResponse>> GetExercisesVisibleToUserAsync(Guid userId)
     {
         var exercises = await exerciseRepository.GetExercisesVisibleToUserAsync(userId);
@@ -35,6 +36,7 @@ public class ExerciseService(ExerciseRepository exerciseRepository) : IExerciseS
             CreatedBy = userId,
             CreatedAt = DateTime.UtcNow
         };
+        
 
         var created = await exerciseRepository.AddExerciseAsync(exercise);
         return created.ToResponse();

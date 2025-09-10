@@ -14,10 +14,10 @@ public class WorkoutRepository(AppDbContext db)
             .ToListAsync();
     }
 
-    public async Task<List<Workout>> GetWorkoutByNameAsync(string name)
+    public async Task<List<Workout>> GetWorkoutByNameAsync(Guid workoutId)
     {
         return await db.Workouts
-            .Where(w => w.Name == name)
+            .Where(w => w.Id == workoutId)
             .OrderBy(w => w.IsCustom)
             .ToListAsync();
     }
@@ -29,10 +29,13 @@ public class WorkoutRepository(AppDbContext db)
         return workout;
     }
     
-    public async Task<List<WorkoutExercise>> AddExercisesToWorkoutAsync(string workoutName, List<WorkoutExercise> exercises, Guid userId)
+    public async Task<List<WorkoutExercise>> AddExercisesToWorkoutAsync(
+        Guid workoutId, 
+        List<WorkoutExercise> exercises, 
+        Guid userId)
     {
         var workout = await db.Workouts
-            .FirstOrDefaultAsync(w => w.Name == workoutName);
+            .FirstOrDefaultAsync(w => w.Id == workoutId);
         
         if(workout == null)
             throw new InvalidOperationException("Workout not found.");
@@ -43,7 +46,10 @@ public class WorkoutRepository(AppDbContext db)
         db.WorkoutExercises.AddRange(exercises);
         await db.SaveChangesAsync();
         
-        return exercises;
+        return await db.WorkoutExercises
+            .Where(we => we.WorkoutId == workoutId)
+            .Include(we => we.Exercise)
+            .ToListAsync();
     }
 
     public async Task DeleteAsync(string workoutName, Guid userId)

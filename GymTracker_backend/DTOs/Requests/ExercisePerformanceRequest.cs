@@ -5,7 +5,7 @@ namespace GymTracker_backend.DTOs.Requests;
 public class ExercisePerformanceRequest
 {
     [Required]
-    public string ExerciseName { get; set; } = null!;
+    public Guid ExerciseId { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessage = "SetNumber must be at least 1.")]
     public int SetNumber { get; set; }

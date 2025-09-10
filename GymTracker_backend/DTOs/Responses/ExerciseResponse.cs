@@ -2,6 +2,7 @@ namespace GymTracker_backend.DTOs.Responses;
 
 public class ExerciseResponse
 {
+    public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public string CategoryName { get; set; } = null!;
     public string[] MuscleGroupNames { get; set; } = null!;

@@ -24,10 +24,10 @@ public class WorkoutController(IWorkoutService service) : ControllerBase
         return Ok(new { workouts = result });
     }
 
-    [HttpGet("{name}")]
-    public async Task<ActionResult<List<WorkoutResponse>>> GetByName([FromRoute] string name)
+    [HttpGet("{workoutId}")]
+    public async Task<ActionResult<List<WorkoutResponse>>> GetByName([FromRoute] Guid workoutId)
     {
-        var result = await service.GetWorkoutByNameAsync(name);
+        var result = await service.GetWorkoutByNameAsync(workoutId);
         return Ok(new { workouts = result });
     }
 
@@ -39,13 +39,13 @@ public class WorkoutController(IWorkoutService service) : ControllerBase
         return Ok(new { workout = result });
     }
 
-    [HttpPost("{name}/exercises")]
+    [HttpPost("{workoutId:guid}/exercises")]
     public async Task<ActionResult<List<WorkoutExerciseResponse>>> AddExercisesToWorkout(
-        [FromRoute] string name, 
+        [FromRoute] Guid workoutId, 
         [FromBody] List<WorkoutExerciseRequest> exercises)
     {
         var userId = User.GetUserId();
-        var result = await service.AddExercisesToWorkout(name, exercises, userId);
+        var result = await service.AddExercisesToWorkout(workoutId, exercises, userId);
         return Ok(new { workoutExercises = result });
     }
     

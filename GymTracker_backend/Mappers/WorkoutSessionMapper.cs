@@ -11,7 +11,8 @@ public static class WorkoutSessionMapper
         {
             Id = s.Id,
             UserId = s.UserId,
-            WorkoutName = s.WorkoutName,
+            WorkoutId = s.WorkoutId,
+            WorkoutName = s.Workout?.Name ?? "",
             StartTime = s.StartTime,
             EndTime = s.EndTime,
             TotalCalories = s.TotalCalories,

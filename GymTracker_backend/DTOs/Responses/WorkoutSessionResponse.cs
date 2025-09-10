@@ -4,7 +4,8 @@ public class WorkoutSessionResponse
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
-    public string? WorkoutName { get; set; }
+    public Guid WorkoutId { get; set; }
+    public string WorkoutName { get; set; } = null!;
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public double? TotalCalories { get; set; }

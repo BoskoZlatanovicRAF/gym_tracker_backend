@@ -8,7 +8,8 @@ public class ExerciseRequest
     [MaxLength(100, ErrorMessage = "Exercise name cannot exceed 100 characters.")]
     public string Name { get; set; } = null!;
 
-    [Required] public string CategoryName { get; set; } = null!;
+    [Required] 
+    public string CategoryName { get; set; } = null!;
 
     [Required]
     [MinLength(1, ErrorMessage = "At least one muscle group is required.")]

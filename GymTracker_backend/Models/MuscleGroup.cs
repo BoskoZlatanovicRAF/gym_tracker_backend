@@ -3,20 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GymTracker_backend.Models;
 
-[Table("muscle_groups")]
 public class MuscleGroup
 {
-    [Key] [Column("name")] 
+    [Key]
     public string Name { get; set; } = null!;
-    
-    [Column("category_name")]
     public string CategoryName { get; set; } = null!;
-    
-    [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-    [ForeignKey(nameof(CategoryName))]
-    [InverseProperty(nameof(Category.MuscleGroups))]
+    //navigation
     public Category Category { get; set; } = null!;
 
 }

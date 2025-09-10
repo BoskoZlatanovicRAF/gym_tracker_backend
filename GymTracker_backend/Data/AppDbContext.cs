@@ -17,18 +17,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<WorkoutExercise>()
-            .HasKey(we => new { we.WorkoutName, we.ExerciseName });
+            .HasKey(we => new { we.WorkoutId, we.ExerciseId });
         
-        modelBuilder.Entity<WorkoutExercise>()
-            .HasOne(we => we.Workout)
-            .WithMany(w => w.WorkoutExercises)
-            .HasForeignKey(we => we.WorkoutName);
+        modelBuilder.Entity<Exercise>()
+            .HasIndex(e => new { e.Name, e.CreatedBy })
+            .IsUnique();
 
-        modelBuilder.Entity<WorkoutExercise>()
-            .HasOne(we => we.Exercise)
-            .WithMany(e => e.WorkoutExercises)
-            .HasForeignKey(we => we.ExerciseName);
+        modelBuilder.Entity<Workout>()
+            .HasIndex(w => new { w.Name, w.CreatedBy })
+            .IsUnique();
         
+        modelBuilder.Entity<WorkoutSession>()
+            .HasOne(ws => ws.Workout)
+            .WithMany(w => w.Sessions)
+            .HasForeignKey(ws => ws.WorkoutId)
+            .OnDelete(DeleteBehavior.SetNull); // keep session even if workout is deleted
         base.OnModelCreating(modelBuilder);
 
     }

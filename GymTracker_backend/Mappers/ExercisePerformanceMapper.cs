@@ -10,7 +10,7 @@ public static class ExercisePerformanceMapper
         return new ExercisePerformanceResponse
         {
             Id = perf.Id,
-            ExerciseName = perf.ExerciseName,
+            ExerciseId = perf.ExerciseId,
             SetNumber = perf.SetNumber,
             Reps = perf.Reps,
             WeightKg = perf.WeightKg,
