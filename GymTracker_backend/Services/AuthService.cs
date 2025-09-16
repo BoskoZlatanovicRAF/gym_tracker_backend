@@ -51,7 +51,7 @@ public class AuthService(UserRepository userRepository, IConfiguration configura
     public async Task<string> LoginAsync(LoginRequest request)
     {
         var user = await userRepository.GetByEmailAsync(request.Email);
-        if(user == null)
+        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             throw new InvalidOperationException("Invalid email or password");
         
         return GenerateJwtToken(user);
