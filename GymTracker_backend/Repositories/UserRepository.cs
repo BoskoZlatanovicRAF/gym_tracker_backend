@@ -18,4 +18,21 @@ public class UserRepository(AppDbContext db)
         db.Users.Add(user);
         await db.SaveChangesAsync();
     }
+    
+    public async Task<User?> GetUserByIdAsync(Guid userId)
+    {
+        return await db.Users
+            .Where(u => u.Id == userId)
+            .Select(u => new User
+            {
+                Id = u.Id,
+                Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                HeightCm = u.HeightCm,
+                WeightKg = u.WeightKg,
+                PreferredUnits = u.PreferredUnits
+            })
+            .FirstOrDefaultAsync();
+    }
 }

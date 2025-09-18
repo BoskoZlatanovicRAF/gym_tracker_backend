@@ -52,6 +52,7 @@ public class Program
         builder.Services.AddScoped<IExercisePerformanceService, ExercisePerformanceService>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<IMuscleGroupService, MuscleGroupService>();
+        builder.Services.AddScoped<IUserService, UserService>();
         
         var app = builder.Build();
 

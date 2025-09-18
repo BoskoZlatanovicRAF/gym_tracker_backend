@@ -41,10 +41,7 @@ public class AuthService(UserRepository userRepository, IConfiguration configura
 
         return new RegisterResponse
         {
-            Id = user.Id,
-            Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName
+            jwt = GenerateJwtToken(user),
         };
     }
 
@@ -65,7 +62,7 @@ public class AuthService(UserRepository userRepository, IConfiguration configura
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            expires: DateTime.UtcNow.AddHours(24),
+            expires: DateTime.UtcNow.AddDays(7),
             signingCredentials: creds,
             claims:
             [
