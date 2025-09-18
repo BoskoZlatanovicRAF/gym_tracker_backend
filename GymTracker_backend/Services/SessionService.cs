@@ -12,6 +12,11 @@ public interface ISessionService
     Task<WorkoutSessionResponse> StartSessionAsync(Guid userId, StartSessionRequest request);
     Task EndSessionAsync(Guid userId, EndSessionRequest request);
     Task<List<WorkoutSessionResponse>> GetSessionsForUserAsync(Guid userId);
+    Task<(string WorkoutName, TimeSpan Duration, double? TotalCalories)> GetLastSessionAsync(Guid userId);
+    Task<(string WorkoutName, int Count)> GetMostRepeatedSessionAsync(Guid userId);
+    Task<(string WorkoutName, DateTime Date, double TotalCalories)> GetBestWorkoutAsync(Guid userId);
+    Task<Dictionary<DayOfWeek, bool>> GetWorkoutsForCurrentWeekAsync(Guid userId);
+    Task<List<(DateTime StartDate, DateTime EndDate, int WorkoutCount)>> GetWorkoutsPerWeekInPastMonthAsync(Guid userId);
 }
 
 public class SessionService(SessionRepository repo, AppDbContext db) : ISessionService
@@ -47,4 +52,30 @@ public class SessionService(SessionRepository repo, AppDbContext db) : ISessionS
         var sessions = await repo.GetAllByUserAsync(userId);
         return sessions.Select(s => s.ToResponse(s.Workout?.Name ?? "")).ToList();
     }
+    
+    public async Task<(string WorkoutName, int Count)> GetMostRepeatedSessionAsync(Guid userId)
+    {
+        return await repo.GetMostRepeatedSessionAsync(userId);
+    }
+    
+    public async Task<(string WorkoutName, DateTime Date, double TotalCalories)> GetBestWorkoutAsync(Guid userId)
+    {
+        return await repo.GetBestWorkoutAsync(userId);
+    }
+    
+    public async Task<Dictionary<DayOfWeek, bool>> GetWorkoutsForCurrentWeekAsync(Guid userId)
+    {
+        return await repo.GetWorkoutsForCurrentWeekAsync(userId);
+    }
+    
+    public async Task<List<(DateTime StartDate, DateTime EndDate, int WorkoutCount)>> GetWorkoutsPerWeekInPastMonthAsync(Guid userId)
+    {
+        return await repo.GetWorkoutsPerWeekInPastMonthAsync(userId);
+    }
+    
+    public async Task<(string WorkoutName, TimeSpan Duration, double? TotalCalories)> GetLastSessionAsync(Guid userId)
+    {
+        return await repo.GetLastSessionAsync(userId);
+    }
+    
 }

@@ -35,4 +35,56 @@ public class SessionController(ISessionService service) : ControllerBase
         var result = await service.GetSessionsForUserAsync(userId);
         return Ok(new { sessions = result });
     }
+    
+    [HttpGet("last-session")]
+    public async Task<ActionResult> GetLastSession()
+    {
+        var userId = User.GetUserId();
+        var (workoutName, duration, totalCalories) = await service.GetLastSessionAsync(userId);
+    
+        return Ok(new
+        {
+            workoutName,
+            duration = duration.ToString(@"hh\:mm\:ss"),
+            totalCalories
+        });
+    }
+    
+    [HttpGet("most-repeated")]
+    public async Task<ActionResult> GetMostRepeatedSession()
+    {
+        var userId = User.GetUserId();
+        var (workoutName, count) = await service.GetMostRepeatedSessionAsync(userId);
+        return Ok(new { workoutName, count });
+    }
+    
+    [HttpGet("best-workout")]
+    public async Task<ActionResult> GetBestWorkout()
+    {
+        var userId = User.GetUserId();
+        var (workoutName, date, totalCalories) = await service.GetBestWorkoutAsync(userId);
+        return Ok(new { workoutName, date, totalCalories });
+    }
+    
+    [HttpGet("workouts-this-week")]
+    public async Task<ActionResult> GetWorkoutsForCurrentWeek()
+    {
+        var userId = User.GetUserId();
+        var result = await service.GetWorkoutsForCurrentWeekAsync(userId);
+        return Ok(result);
+    }
+    
+    [HttpGet("workouts-per-week")]
+    public async Task<ActionResult> GetWorkoutsPerWeekInPastMonth()
+    {
+        var userId = User.GetUserId();
+        var result = await service.GetWorkoutsPerWeekInPastMonthAsync(userId);
+        var response = result.Select(r => new
+        {
+            startDate = r.StartDate.ToString("yyyy-MM-dd"),
+            endDate = r.EndDate.ToString("yyyy-MM-dd"),
+            workoutCount = r.WorkoutCount
+        });
+        return Ok(response);
+    }
 }
