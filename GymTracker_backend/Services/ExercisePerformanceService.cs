@@ -8,28 +8,34 @@ namespace GymTracker_backend.Services;
 
 public interface IExercisePerformanceService
 {
-    Task RecordAsync(Guid sessionId, List<ExercisePerformanceRequest> requests);
+    Task RecordForActiveSessionAsync(Guid sessionId, List<ExercisePerformanceRequest> requests);
     Task<List<ExercisePerformanceResponse>> GetBySessionIdAsync(Guid sessionId);
 
 }
 
-public class ExercisePerformanceService(ExercisePerformanceRepository repo) : IExercisePerformanceService
+public class ExercisePerformanceService(ExercisePerformanceRepository repo, SessionRepository sessionRepo) : IExercisePerformanceService
 {
-    public async Task RecordAsync(Guid sessionId, List<ExercisePerformanceRequest> requests)
+public async Task RecordForActiveSessionAsync(Guid userId, List<ExercisePerformanceRequest> requests)
+{
+    // Find the active session for the user
+    var activeSession = await sessionRepo.GetActiveSessionForUserAsync(userId);
+    if (activeSession == null)
+        throw new InvalidOperationException("No active session found for the user.");
+
+    // Map requests to ExercisePerformance entities
+    var performances = requests.Select(r => new ExercisePerformance
     {
-        var performances = requests.Select(r => new ExercisePerformance
-        {
-            SessionId = sessionId,
-            ExerciseId = r.ExerciseId,
-            SetNumber = r.SetNumber,
-            Reps = r.Reps,
-            WeightKg = r.WeightKg,
-            CreatedAt = DateTime.UtcNow
-        }).ToList();
+        SessionId = activeSession.Id,
+        ExerciseId = r.ExerciseId,
+        SetNumber = r.SetNumber,
+        Reps = r.Reps,
+        WeightKg = r.WeightKg,
+        CreatedAt = DateTime.UtcNow
+    }).ToList();
 
-        await repo.RecordManyAsync(performances);
-    }
-
+    // Save the performances
+    await repo.RecordManyAsync(performances);
+}
     public async Task<List<ExercisePerformanceResponse>> GetBySessionIdAsync(Guid sessionId)
     {
         var performances = await repo.GetBySessionIdAsync(sessionId);

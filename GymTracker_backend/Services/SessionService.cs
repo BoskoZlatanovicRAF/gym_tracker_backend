@@ -17,6 +17,8 @@ public interface ISessionService
     Task<(string WorkoutName, DateTime Date, double TotalCalories)> GetBestWorkoutAsync(Guid userId);
     Task<Dictionary<DayOfWeek, bool>> GetWorkoutsForCurrentWeekAsync(Guid userId);
     Task<List<(DateTime StartDate, DateTime EndDate, int WorkoutCount)>> GetWorkoutsPerWeekInPastMonthAsync(Guid userId);
+    Task<Dictionary<DateTime, double>> GetCaloriesBurnedPerDayInCurrentWeekAsync(Guid userId);
+    Task DeleteActiveSessionAsync(Guid userId);
 }
 
 public class SessionService(SessionRepository repo, AppDbContext db) : ISessionService
@@ -44,7 +46,7 @@ public class SessionService(SessionRepository repo, AppDbContext db) : ISessionS
 
     public async Task EndSessionAsync(Guid userId, EndSessionRequest request)
     {
-        await repo.EndAsync(userId, DateTime.UtcNow, request.TotalCalories, request.Notes);
+        await repo.EndAsync(userId, DateTime.UtcNow, double.Ceiling(request.TotalCalories), request.Notes);
     }
 
     public async Task<List<WorkoutSessionResponse>> GetSessionsForUserAsync(Guid userId)
@@ -76,6 +78,20 @@ public class SessionService(SessionRepository repo, AppDbContext db) : ISessionS
     public async Task<(string WorkoutName, TimeSpan Duration, double? TotalCalories)> GetLastSessionAsync(Guid userId)
     {
         return await repo.GetLastSessionAsync(userId);
+    }
+    
+    public async Task<Dictionary<DateTime, double>> GetCaloriesBurnedPerDayInCurrentWeekAsync(Guid userId)
+    {
+        return await repo.GetCaloriesBurnedPerDayInCurrentWeekAsync(userId);
+    }
+    
+    public async Task DeleteActiveSessionAsync(Guid userId)
+    {
+        var activeSessions = await repo.GetActiveSessionsForUserAsync(userId);
+        if (!activeSessions.Any())
+            throw new InvalidOperationException("No active sessions found for the user.");
+
+        await repo.DeleteManyAsync(activeSessions);
     }
     
 }

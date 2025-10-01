@@ -48,8 +48,15 @@ public class WorkoutController(IWorkoutService service) : ControllerBase
         var result = await service.AddExercisesToWorkout(workoutId, exercises, userId);
         return Ok(new { workoutExercises = result });
     }
-    
 
+    [HttpGet("muscle-groups")]
+    public async Task<ActionResult<List<WorkoutMuscleGroupResponse>>> GetMuscleGroupsForWorkouts([FromQuery] List<string> muscleGroups, [FromQuery] List<string> categories)
+    {
+        var userId = User.GetUserId();
+        var result = await service.GetMuscleGroupsForWorkouts(userId, categories, muscleGroups);
+        return Ok(new { workoutMuscleGroups = result });
+    }
+    
     [HttpDelete("{name}")]
     public async Task<IActionResult> Delete(string name)
     {
@@ -58,6 +65,12 @@ public class WorkoutController(IWorkoutService service) : ControllerBase
         return NoContent();
     }
     
-
+    [HttpGet("workout-details/{workoutId}")]
+    public async Task<ActionResult<WorkoutDetailsResponse>> GetWorkoutDetails([FromRoute] Guid workoutId)
+    {
+        var userId = User.GetUserId();
+        var result = await service.GetWorkoutDetailsAsync(workoutId, userId);
+        return Ok(result);
+    }
 }
 

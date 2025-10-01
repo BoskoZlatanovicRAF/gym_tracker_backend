@@ -21,18 +21,18 @@ public class UserRepository(AppDbContext db)
     
     public async Task<User?> GetUserByIdAsync(Guid userId)
     {
-        return await db.Users
-            .Where(u => u.Id == userId)
-            .Select(u => new User
-            {
-                Id = u.Id,
-                Email = u.Email,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                HeightCm = u.HeightCm,
-                WeightKg = u.WeightKg,
-                PreferredUnits = u.PreferredUnits
-            })
-            .FirstOrDefaultAsync();
+        return await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+    }
+    
+    public async Task<string?> GetUserNameByIdAsync(Guid? userId)
+    {
+        var user = await db.Users.FindAsync(userId);
+        return user?.FirstName+" "+user?.LastName;
+    }
+    
+    public async Task UpdateUserAsync(User user)
+    {
+        db.Users.Update(user);
+        await db.SaveChangesAsync();
     }
 }

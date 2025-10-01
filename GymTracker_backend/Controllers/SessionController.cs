@@ -87,4 +87,28 @@ public class SessionController(ISessionService service) : ControllerBase
         });
         return Ok(response);
     }
+    
+    [HttpGet("calories-this-week")]
+    public async Task<ActionResult> GetCaloriesBurnedPerDayInCurrentWeek()
+    {
+        var userId = User.GetUserId();
+        var result = await service.GetCaloriesBurnedPerDayInCurrentWeekAsync(userId);
+    
+        var response = result.Select(r => new
+        {
+            date = r.Key.ToString("yyyy-MM-dd"),
+            caloriesBurned = r.Value
+        });
+    
+        return Ok(response);
+    }
+    
+    [HttpDelete("active")]
+    public async Task<IActionResult> DeleteActiveSession()
+    {
+        var userId = User.GetUserId();
+        await service.DeleteActiveSessionAsync(userId);
+        return Ok();
+    }
+    
 }

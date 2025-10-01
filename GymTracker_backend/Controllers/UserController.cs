@@ -1,3 +1,4 @@
+using GymTracker_backend.DTOs.Requests;
 using GymTracker_backend.Helpers;
 using GymTracker_backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -29,5 +30,13 @@ public class UserController(IUserService service) : ControllerBase
             user.WeightKg,
             user.PreferredUnits
         });
+    }
+    
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateUserRequest request)
+    {
+        var userId = User.GetUserId();
+        await service.UpdateUserAsync(userId, request);
+        return Ok(new { message = "User profile updated successfully" });
     }
 }

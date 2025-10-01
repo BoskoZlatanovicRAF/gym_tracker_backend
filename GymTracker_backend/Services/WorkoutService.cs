@@ -13,9 +13,11 @@ public interface IWorkoutService
     Task<WorkoutResponse> CreateAsync(WorkoutRequest request, Guid userId);
     Task<List<WorkoutExerciseResponse>> AddExercisesToWorkout(Guid workoutId, List<WorkoutExerciseRequest> exercises, Guid userId);
     Task DeleteAsync(string workoutName, Guid userId);
+    Task <List<WorkoutMuscleGroupResponse>> GetMuscleGroupsForWorkouts(Guid userId, List<string> categories, List<string> muscleGroups);
+    Task<WorkoutDetailsResponse> GetWorkoutDetailsAsync(Guid workoutId, Guid userId);
 }
 
-public class WorkoutService(WorkoutRepository repo) : IWorkoutService
+public class WorkoutService(WorkoutRepository repo, WorkoutExerciseRepository workoutExerciseRepo, UserRepository userRepo, SessionRepository sessionRepo) : IWorkoutService
 {
     public async Task<List<WorkoutResponse>> GetVisibleToUserAsync(Guid userId)
     {
@@ -67,5 +69,56 @@ public class WorkoutService(WorkoutRepository repo) : IWorkoutService
     public async Task DeleteAsync(string workoutName, Guid userId)
     {
         await repo.DeleteAsync(workoutName, userId);
+    }
+
+    public async Task<List<WorkoutMuscleGroupResponse>> GetMuscleGroupsForWorkouts(Guid userId, List<string>? categories, List<string>? muscleGroups)
+    {
+        var workouts = await workoutExerciseRepo.GetMuscleGroupsForWorkouts(userId, categories, muscleGroups);
+        return workouts.Select(w =>
+        {
+            var muscleGroups = w.WorkoutExercises
+                .SelectMany(we => we.Exercise.MuscleGroupNames)
+                .Distinct()
+                .ToList();
+
+            var categories = w.WorkoutExercises
+                .Select(we => we.Exercise.CategoryName)
+                .Distinct()
+                .ToList();
+
+            return new WorkoutMuscleGroupResponse
+            {
+                Id = w.Id,
+                Name = w.Name,
+                Description = w.Description,
+                ImageUrl = w.ImageUrl,
+                IsCustom = w.IsCustom,
+                CreatedAt = w.CreatedAt,
+                MuscleGroups = muscleGroups,
+                Categories = categories
+            };
+        }).ToList();
+    }
+    
+    public async Task<WorkoutDetailsResponse> GetWorkoutDetailsAsync(Guid workoutId, Guid userId)
+    {
+        var workout = await repo.GetByIdAsync(workoutId);
+        if (workout == null)
+            throw new KeyNotFoundException("Workout not found");
+
+        var createdByName = workout.IsCustom
+            ? await userRepo.GetUserNameByIdAsync(workout.CreatedBy)
+            : null;
+
+        var sessionCount = await sessionRepo.GetSessionCountForWorkoutAsync(userId, workoutId);
+
+        return new WorkoutDetailsResponse
+        {
+            Name = workout.Name,
+            CreatedByName = createdByName,
+            Description = workout.Description,
+            ImageUrl = workout.ImageUrl,
+            SessionCount = sessionCount
+        };
     }
 }

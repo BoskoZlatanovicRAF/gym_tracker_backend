@@ -44,6 +44,7 @@ public class Program
         builder.Services.AddScoped<WorkoutRepository>();
         builder.Services.AddScoped<SessionRepository>();
         builder.Services.AddScoped<ExercisePerformanceRepository>();
+        builder.Services.AddScoped<WorkoutExerciseRepository>();
 
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IExerciseService, ExerciseService>();
@@ -53,6 +54,7 @@ public class Program
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<IMuscleGroupService, MuscleGroupService>();
         builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IWorkoutExerciseService, WorkoutExerciseService>();
         
         var app = builder.Build();
 

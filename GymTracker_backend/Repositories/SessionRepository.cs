@@ -20,7 +20,7 @@ public class SessionRepository(AppDbContext db)
             throw new InvalidOperationException("No active session found for user.");
 
         session.EndTime = endTime;
-        session.TotalCalories = calories;
+        session.TotalCalories = calories ?? 0;
         session.Notes = notes;
         session.UpdatedAt = DateTime.UtcNow;
 
@@ -79,8 +79,13 @@ public class SessionRepository(AppDbContext db)
     
     public async Task<Dictionary<DayOfWeek, bool>> GetWorkoutsForCurrentWeekAsync(Guid userId)
     {
-        var startOfWeek = DateTime.UtcNow.Date.AddDays(-(int)DateTime.UtcNow.DayOfWeek);
-        var endOfWeek = startOfWeek.AddDays(7);
+        var today = DateTime.UtcNow.Date;
+
+        // Normalize so that Monday = 0, Sunday = 6
+        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+
+        var startOfWeek = today.AddDays(-diff);         // Monday of the current week
+        var endOfWeek = startOfWeek.AddDays(7);         // next Monday (exclusive)
 
         var sessions = await db.WorkoutSessions
             .Where(s => s.UserId == userId && s.StartTime >= startOfWeek && s.StartTime < endOfWeek)
@@ -91,25 +96,27 @@ public class SessionRepository(AppDbContext db)
 
         return result;
     }
+
     
     public async Task<List<(DateTime StartDate, DateTime EndDate, int WorkoutCount)>> GetWorkoutsPerWeekInPastMonthAsync(Guid userId)
     {
-        var oneMonthAgo = DateTime.UtcNow.Date.AddMonths(-1);
         var today = DateTime.UtcNow.Date;
-    
+        var startOfCurrentWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday); // Start of the current week (Monday)
+        var startDate = startOfCurrentWeek.AddDays(-21); // Start date is 3 weeks before the current week
+
         var sessions = await db.WorkoutSessions
-            .Where(s => s.UserId == userId && s.StartTime.Date >= oneMonthAgo && s.StartTime.Date <= today)
+            .Where(s => s.UserId == userId && s.StartTime.Date >= startDate && s.StartTime.Date <= today)
             .ToListAsync();
-    
+
         var result = new List<(DateTime StartDate, DateTime EndDate, int WorkoutCount)>();
-    
-        for (var startOfWeek = oneMonthAgo; startOfWeek <= today; startOfWeek = startOfWeek.AddDays(7))
+
+        for (var startOfWeek = startDate; startOfWeek <= startOfCurrentWeek; startOfWeek = startOfWeek.AddDays(7))
         {
             var endOfWeek = startOfWeek.AddDays(6);
             var count = sessions.Count(s => s.StartTime.Date >= startOfWeek && s.StartTime.Date <= endOfWeek);
             result.Add((startOfWeek, endOfWeek, count));
         }
-    
+
         return result;
     }
     
@@ -126,5 +133,64 @@ public class SessionRepository(AppDbContext db)
 
         var duration = session.EndTime.Value - session.StartTime;
         return (session.Workout?.Name ?? "Unknown Workout", duration, session.TotalCalories);
+    }
+    
+    public async Task<Dictionary<DateTime, double>> GetCaloriesBurnedPerDayInCurrentWeekAsync(Guid userId)
+    {
+        var today = DateTime.UtcNow.Date;
+
+        // Normalize so Monday = 0 … Sunday = 6
+        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+
+        var startOfCurrentWeek = today.AddDays(-diff);     // Monday of this week
+        var endOfCurrentWeek = startOfCurrentWeek.AddDays(7); // Next Monday (exclusive)
+
+        var sessions = await db.WorkoutSessions
+            .Where(s => s.UserId == userId && s.StartTime.Date >= startOfCurrentWeek && s.StartTime.Date < endOfCurrentWeek)
+            .ToListAsync();
+
+        var result = sessions
+            .GroupBy(s => s.StartTime.Date)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Sum(s => s.TotalCalories ?? 0)
+            );
+
+        // Ensure all days of the week are included
+        for (var date = startOfCurrentWeek; date < endOfCurrentWeek; date = date.AddDays(1))
+        {
+            if (!result.ContainsKey(date))
+            {
+                result[date] = 0;
+            }
+        }
+
+        return result.OrderBy(r => r.Key).ToDictionary(r => r.Key, r => r.Value);
+    }
+    
+    
+    public async Task<int> GetSessionCountForWorkoutAsync(Guid userId, Guid workoutId)
+    {
+        return await db.WorkoutSessions
+            .CountAsync(ws => ws.UserId == userId && ws.WorkoutId == workoutId);
+    }
+    
+    public async Task<WorkoutSession?> GetActiveSessionForUserAsync(Guid userId)
+    {
+        return await db.WorkoutSessions
+            .FirstOrDefaultAsync(ws => ws.UserId == userId && ws.EndTime == null);
+    }
+
+    public async Task<List<WorkoutSession>> GetActiveSessionsForUserAsync(Guid userId)
+    {
+        return await db.WorkoutSessions
+            .Where(ws => ws.UserId == userId && ws.EndTime == null)
+            .ToListAsync();
+    }
+    
+    public async Task DeleteManyAsync(List<WorkoutSession> sessions)
+    {
+        db.WorkoutSessions.RemoveRange(sessions);
+        await db.SaveChangesAsync();
     }
 }

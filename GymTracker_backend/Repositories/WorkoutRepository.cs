@@ -22,6 +22,12 @@ public class WorkoutRepository(AppDbContext db)
             .ToListAsync();
     }
     
+    public async Task<Workout> GetByIdAsync(Guid workoutId)
+    {
+        return (await db.Workouts
+            .FirstOrDefaultAsync(w => w.Id == workoutId))!;
+    }
+    
     public async Task<Workout> AddAsync(Workout workout)
     {
         db.Workouts.Add(workout);

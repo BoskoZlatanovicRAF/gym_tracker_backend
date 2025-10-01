@@ -62,7 +62,7 @@ public class AuthService(UserRepository userRepository, IConfiguration configura
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            expires: DateTime.UtcNow.AddDays(7),
+            expires: DateTime.UtcNow.AddDays(30),
             signingCredentials: creds,
             claims:
             [
